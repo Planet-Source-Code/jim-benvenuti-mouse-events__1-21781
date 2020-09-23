@@ -1,0 +1,413 @@
+WM_MOUSEMOVE
+The WM_MOUSEMOVE message is posted to a window when the cursor moves. If the mouse is not captured, the message is posted to the window that contains the cursor. Otherwise, the message is posted to the window that has captured the mouse. 
+
+A window receives this message through its WindowProc function. 
+
+LRESULT CALLBACK WindowProc(
+  HWND hwnd,       // handle to window
+  UINT uMsg,       // WM_MOUSEMOVE
+  WPARAM wParam,   // key indicators
+  LPARAM lParam    // horizontal and vertical position
+);
+Parameters
+wParam 
+Indicates whether various virtual keys are down. This parameter can be one or more of the following values. Value Description 
+MK_CONTROL The CTRL key is down. 
+MK_LBUTTON The left mouse button is down. 
+MK_MBUTTON The middle mouse button is down. 
+MK_RBUTTON The right mouse button is down. 
+MK_SHIFT The SHIFT key is down. 
+MK_XBUTTON1 Windows 2000: The first X button is down. 
+MK_XBUTTON2 Windows 2000: The second X button is down. 
+
+' Key State Masks for Mouse Messages
+Private Const MK_LBUTTON = &H1
+Private Const MK_RBUTTON = &H2
+Private Const MK_SHIFT = &H4
+Private Const MK_CONTROL = &H8
+Private Const MK_MBUTTON = &H10
+
+
+lParam 
+The low-order word specifies the x-coordinate of the cursor. The coordinate is relative to the upper-left corner of the client area. 
+The high-order word specifies the y-coordinate of the cursor. The coordinate is relative to the upper-left corner of the client area. 
+______________________________________________________________________________
+Client Area Mouse Messages
+A window receives a client area mouse message when a mouse event occurs within the window's client area. The system posts the WM_MOUSEMOVE message to the window when the user moves the cursor within the client area. It posts one of the following messages when the user presses or releases a mouse button while the cursor is within the client area. 
+
+Message Meaning 
+WM_LBUTTONDBLCLK The left mouse button was double-clicked. 
+WM_LBUTTONDOWN The left mouse button was pressed. 
+WM_LBUTTONUP The left mouse button was released. 
+WM_MBUTTONDBLCLK The middle mouse button was double-clicked. 
+WM_MBUTTONDOWN The middle mouse button was pressed. 
+WM_MBUTTONUP The middle mouse button was released. 
+WM_RBUTTONDBLCLK The right mouse button was double-clicked. 
+WM_RBUTTONDOWN The right mouse button was pressed. 
+WM_RBUTTONUP The right mouse button was released. 
+
+Private Const WM_MOUSEFIRST = &H200
+Private Const WM_MOUSEMOVE = &H200
+Private Const WM_LBUTTONDOWN = &H201
+Private Const WM_LBUTTONUP = &H202
+Private Const WM_LBUTTONDBLCLK = &H203
+Private Const WM_RBUTTONDOWN = &H204
+Private Const WM_RBUTTONUP = &H205
+Private Const WM_RBUTTONDBLCLK = &H206
+Private Const WM_MBUTTONDOWN = &H207
+Private Const WM_MBUTTONUP = &H208
+Private Const WM_MBUTTONDBLCLK = &H209
+Private Const WM_MOUSELAST = &H209
+
+In addition, an application can call the TrackMouseEvent function to have the system send two other messages. It posts the WM_MOUSEHOVER message when the cursor hovers over the client area for a certain time period. It posts the WM_MOUSELEAVE message when the cursor leaves the client area.
+
+Message Parameters
+The lParam parameter of a client area mouse message indicates the position of the cursor hot spot. The low-order word indicates the x-coordinate of the hot spot, and the high-order word indicates the y-coordinate. The coordinates are specified in client coordinates. In the client coordinate system, all points on the screen are specified relative to the coordinates (0,0) of the upper-left corner of the client area. 
+
+The wParam parameter contains flags that indicate the status of the other mouse buttons and the CTRL and SHIFT keys at the time of the mouse event. You can check for these flags when mouse-message processing depends on the state of another mouse button or of the CTRL or SHIFT key. The lParam parameter can be a combination of the following values. 
+
+Value Meaning 
+MK_CONTROL The CTRL key is down. 
+MK_LBUTTON The left mouse button is down. 
+MK_MBUTTON The middle mouse button is down. 
+MK_RBUTTON The right mouse button is down. 
+MK_SHIFT The SHIFT key is down. 
+MK_XBUTTON1 Windows 2000: the first X button is down. 
+MK_XBUTTON2 Windows 2000: the second X button is down. 
+
+
+Double-Click Messages
+The system generates a double-click message when the user clicks a mouse button twice in quick succession. When the user clicks a button, the system establishes a rectangle centered around the cursor hot spot. It also marks the time at which the click occurred. When the user clicks the same button a second time, the system determines whether the hot spot is still within the rectangle and calculates the time elapsed since the first click. If the hot spot is still within the rectangle and the elapsed time does not exceed the double-click time-out value, the system generates a double-click message. 
+
+An application can get and set double-click time-out values by using the GetDoubleClickTime and SetDoubleClickTime functions, respectively. Alternatively, the application can set the double-click–time-out value by using the SPI_SETDOUBLECLICKTIME flag with the SystemParametersInfo function. It can also set the size of the rectangle that the system uses to detect double-clicks by passing the SPI_SETDOUBLECLKWIDTH and SPI_SETDOUBLECLKHEIGHT flags to SystemParametersInfo. Note, however, that setting the double-click–time-out value and rectangle affects all applications. 
+
+An application-defined window does not, by default, receive double-click messages. Because of the system overhead involved in generating double-click messages, these messages are generated only for windows belonging to classes that have the CS_DBLCLKS class style. Your application must set this style when registering the window class. For more information, see Window Classes. 
+
+A double-click message is always the third message in a four-message series. The first two messages are the button-down and button-up messages generated by the first click. The second click generates the double-click message followed by another button-up message. For example, double-clicking the left mouse button generates the following message sequence: 
+
+WM_LBUTTONDOWN
+WM_LBUTTONUP
+WM_LBUTTONDBLCLK
+WM_LBUTTONUP
+
+Because a window always receives a button-down message before receiving a double-click message, an application typically uses a double-click message to extend a task it began during a button-down message. For example, when the user clicks a color in the color palette of Microsoft® Paint, Paint displays the selected color next to the palette. When the user double-clicks a color, Paint displays the color and opens the Edit Colors dialog box. 
+
+_____________________________________________________
+
+WM_MOUSEHOVER
+The WM_MOUSEHOVER message is posted to a window when the cursor hovers over the client area of the window for the period of time specified in a prior call to TrackMouseEvent. 
+
+A window receives this message through its WindowProc function. 
+
+LRESULT CALLBACK WindowProc(
+  HWND hwnd,       // handle to window
+  UINT uMsg,       // WM_MOUSEHOVER
+  WPARAM wParam,   // key indicator
+  LPARAM lParam    // horizontal and vertical position
+);
+Parameters
+wParam 
+Indicates whether various virtual keys are down. This parameter can be one or more of the following values. Value Description 
+MK_CONTROL The CTRL key is depressed. 
+MK_LBUTTON The left mouse button is depressed. 
+MK_MBUTTON The middle mouse button is depressed. 
+MK_RBUTTON The right mouse button is depressed. 
+MK_SHIFT The SHIFT key is depressed. 
+MK_XBUTTON1 Windows 2000: The first X button is down. 
+MK_XBUTTON2 Windows 2000: The second X button is down. 
+
+
+lParam 
+The low-order word specifies the x-coordinate of the cursor. The coordinate is relative to the upper-left corner of the client area. 
+The high-order word specifies the y-coordinate of the cursor. The coordinate is relative to the upper-left corner of the client area. 
+
+Return Values
+If an application processes this message, it should return zero. 
+
+Remarks
+Hover tracking stops when WM_MOUSEHOVER is generated. The application must call TrackMouseEvent again if it requires further tracking of mouse hover behavior.
+
+Use the following code to obtain the horizontal and vertical position:
+
+xPos = GET_X_LPARAM(lParam); 
+yPos = GET_Y_LPARAM(lParam); 
+You can also use the MAKEPOINTS macro to convert the lParam parameter to a POINTS structure. 
+
+Requirements 
+  Windows NT/2000: Requires Windows NT 4.0 or later.
+  Windows 95/98: Requires Windows 98 or later.
+  Header: Declared in Winuser.h; include Windows.h.
+
+See Also
+Mouse Input Overview, Mouse Input Messages, GET_X_LPARAM, GET_Y_LPARAM, GetCapture, MAKEPOINTS, POINTS, SetCapture, TrackMouseEvent, TRACKMOUSEEVENT, WM_MOUSEHOVER 
+
+_____________________________________________________
+
+WM_MOUSELEAVE
+The WM_MOUSELEAVE message is posted to a window when the cursor leaves the client area of the window specified in a prior call to TrackMouseEvent. 
+
+A window receives this message through its WindowProc function. 
+
+LRESULT CALLBACK WindowProc(
+  HWND hwnd,       // handle to window
+  UINT uMsg,       // WM_MOUSELEAVE
+  WPARAM wParam,   // not used
+  LPARAM lParam    // not used
+);
+Parameters
+This message has no parameters.
+
+Return Values
+If an application processes this message, it should return zero. 
+
+Remarks
+All tracking requested by TrackMouseEvent is canceled when this message is generated. The application must call TrackMouseEvent when the mouse reenters its window if it requires further tracking of mouse hover behavior.
+
+Requirements 
+  Windows NT/2000: Requires Windows NT 4.0 or later.
+  Windows 95/98: Requires Windows 98 or later.
+  Header: Declared in Winuser.h; include Windows.h.
+
+See Also
+Mouse Input Overview, Mouse Input Messages, GetCapture, SetCapture, TrackMouseEvent, TRACKMOUSEEVENT, WM_NCMOUSELEAVE
+
+_______________________________________________________________
+
+TRACKMOUSEEVENT
+The TRACKMOUSEEVENT structure is used by the TrackMouseEvent function to track when the mouse pointer leaves a window or hovers over a window for a specified amount of time.
+
+typedef struct tagTRACKMOUSEEVENT {
+  DWORD cbSize;
+  DWORD dwFlags;
+  HWND  hwndTrack;
+  DWORD dwHoverTime;
+} TRACKMOUSEEVENT, *LPTRACKMOUSEEVENT;
+Members
+cbSize 
+Specifies the size of the TRACKMOUSEEVENT structure. 
+dwFlags 
+Specifies the services requested. This member can be a combination of the following values. Value Meaning 
+TME_CANCEL The caller wants to cancel a prior tracking request. 
+The caller should also specify the type of tracking that it wants to cancel. For example, to cancel hover tracking, the caller must pass the TME_CANCEL and TME_HOVER flags.
+ 
+TME_HOVER The caller wants hover notification. Notification is delivered as a WM_MOUSEHOVER message. 
+If the caller requests hover tracking while hover tracking is already active, the hover timer will be reset.
+
+This flag is ignored if the mouse pointer is not over the specified window or area.
+ 
+TME_LEAVE The caller wants leave notification. Notification is delivered as a WM_MOUSELEAVE message. 
+If the mouse is not over the specified window or area, a leave notification is generated immediately and no further tracking is performed.
+ 
+TME_NONCLIENT Windows 98, Windows 2000: The caller wants hover and leave notification for the nonclient areas. Notification is delivered as WM_NCMOUSEHOVER and WM_NCMOUSELEAVE messages. 
+TME_QUERY The function fills in the structure instead of treating it as a tracking request. The structure is filled such that had that structure been passed to TrackMouseEvent, it would generate the current tracking. The only anomaly is that the hover time-out returned is always the actual time-out and not HOVER_DEFAULT, if HOVER_DEFAULT was specified during the original TrackMouseEvent request. 
+
+
+hwndTrack 
+Specifies a handle to the window to track. 
+dwHoverTime 
+Specifies the hover time-out (if TME_HOVER was specified in dwFlags), in milliseconds. Can be HOVER_DEFAULT, which means to use the system default hover time-out. 
+Remarks
+The system default hover time-out is initially the menu drop-down time, which is 400 milliseconds. You can call SystemParametersInfo and use SPI_GETMOUSEHOVERTIME to retrieve the default hover time-out.
+
+The system default hover rectangle is the same as the double-click rectangle. You can call SystemParametersInfo and use SPI_GETMOUSEHOVERWIDTH and SPI_GETMOUSEHOVERHEIGHT to retrieve the size of the rectangle within which the mouse pointer has to stay for TrackMouseEvent to generate a WM_MOUSEHOVER message.
+
+Requirements 
+  Windows NT/2000: Requires Windows NT 4.0 or later.
+  Windows 95/98: Requires Windows 98 or later.
+  Header: Declared in Winuser.h; include Windows.h.
+
+See Also
+Mouse Input Overview, Mouse Input Structures, SystemParametersInfo, 
+TrackMouseEvent 
+
+________________________________________________________________
+
+WM_LBUTTONDOWN
+The WM_LBUTTONDOWN message is posted when the user presses the left mouse button while the cursor is in the client area of a window. If the mouse is not captured, the message is posted to the window beneath the cursor. Otherwise, the message is posted to the window that has captured the mouse. 
+
+A window receives this message through its WindowProc function. 
+
+LRESULT CALLBACK WindowProc(
+  HWND hwnd,       // handle to window
+  UINT uMsg,       // WM_LBUTTONDOWN
+  WPARAM wParam,   // key indicator
+  LPARAM lParam    // horizontal and vertical position
+);
+Parameters
+wParam 
+Indicates whether various virtual keys are down. This parameter can be one or more of the following values. Value Description 
+MK_CONTROL The CTRL key is down. 
+MK_LBUTTON The left mouse button is down. 
+MK_MBUTTON The middle mouse button is down. 
+MK_RBUTTON The right mouse button is down. 
+MK_SHIFT The SHIFT key is down. 
+MK_XBUTTON1 Windows 2000: The first X button is down. 
+MK_XBUTTON2 Windows 2000: The second X button is down. 
+
+
+lParam 
+The low-order word specifies the x-coordinate of the cursor. The coordinate is relative to the upper-left corner of the client area. 
+The high-order word specifies the y-coordinate of the cursor. The coordinate is relative to the upper-left corner of the client area. 
+
+Return Values
+If an application processes this message, it should return zero. 
+
+Remarks
+Use the following code to obtain the horizontal and vertical position:
+
+xPos = GET_X_LPARAM(lParam); 
+yPos = GET_Y_LPARAM(lParam); 
+You can also use the MAKEPOINTS macro to convert the lParam parameter to a POINTS structure. 
+
+To detect that the ALT key was pressed, check whether GetKeyState(VK_MENU) < 0. Note, this must not be GetAsyncKeyState.
+
+Requirements 
+  Windows NT/2000: Requires Windows NT 3.1 or later.
+  Windows 95/98: Requires Windows 95 or later.
+  Header: Declared in Winuser.h; include Windows.h.
+
+See Also
+Mouse Input Overview, Mouse Input Messages, GET_X_LPARAM, GET_Y_LPARAM, GetCapture, GetKeyState, MAKEPOINTS, POINTS, SetCapture, WM_LBUTTONDBLCLK, WM_LBUTTONUP 
+
+_________________________________________________________
+
+WM_LBUTTONUP
+The WM_LBUTTONUP message is posted when the user releases the left mouse button while the cursor is in the client area of a window. If the mouse is not captured, the message is posted to the window beneath the cursor. Otherwise, the message is posted to the window that has captured the mouse. 
+
+A window receives this message through its WindowProc function. 
+
+LRESULT CALLBACK WindowProc(
+  HWND hwnd,       // handle to window
+  UINT uMsg,       // WM_LBUTTONUP
+  WPARAM wParam,   // key indicator
+  LPARAM lParam    // horizontal and vertical position
+);
+Parameters
+wParam 
+Indicates whether various virtual keys are down. This parameter can be one or more of the following values. Value Description 
+MK_CONTROL The CTRL key is down. 
+MK_MBUTTON The middle mouse button is down. 
+MK_RBUTTON The right mouse button is down. 
+MK_SHIFT The SHIFT key is down. 
+MK_XBUTTON1 Windows 2000: The first X button is down. 
+MK_XBUTTON2 Windows 2000: The second X button is down. 
+
+
+lParam 
+The low-order word specifies the x-coordinate of the cursor. The coordinate is relative to the upper-left corner of the client area. 
+The high-order word specifies the y-coordinate of the cursor. The coordinate is relative to the upper-left corner of the client area. 
+
+Return Values
+If an application processes this message, it should return zero. 
+
+Remarks
+Use the following code to obtain the horizontal and vertical position:
+
+xPos = GET_X_LPARAM(lParam); 
+yPos = GET_Y_LPARAM(lParam); 
+You can also use the MAKEPOINTS macro to convert the lParam parameter to a POINTS structure. 
+
+Requirements 
+  Windows NT/2000: Requires Windows NT 3.1 or later.
+  Windows 95/98: Requires Windows 95 or later.
+  Header: Declared in Winuser.h; include Windows.h.
+
+See Also
+Mouse Input Overview, Mouse Input Messages, GET_X_LPARAM, GET_Y_LPARAM, GetCapture, MAKEPOINTS, POINTS, SetCapture, WM_LBUTTONDBLCLK, WM_LBUTTONDOWN 
+
+________________________________________________________________
+
+mouse_event
+The mouse_event function synthesizes mouse motion and button clicks. 
+
+Windows NT/ 2000: This function has been superseded. Use SendInput instead.
+
+VOID mouse_event(
+  DWORD dwFlags,         // motion and click options
+  DWORD dx,              // horizontal position or change
+  DWORD dy,              // vertical position or change
+  DWORD dwData,          // wheel movement
+  ULONG_PTR dwExtraInfo  // application-defined information
+);
+Parameters
+dwFlags 
+[in] Specifies various aspects of mouse motion and button clicking. This parameter can be certain combinations of the following values. Value Meaning 
+MOUSEEVENTF_ABSOLUTE Specifies that the dx and dy parameters contain normalized absolute coordinates. If not set, those parameters contain relative data: the change in position since the last reported position. This flag can be set, or not set, regardless of what kind of mouse or mouse-like device, if any, is connected to the system. For further information about relative mouse motion, see the following Remarks section. 
+MOUSEEVENTF_MOVE Specifies that movement occurred. 
+MOUSEEVENTF_LEFTDOWN Specifies that the left button is down. 
+MOUSEEVENTF_LEFTUP Specifies that the left button is up. 
+MOUSEEVENTF_RIGHTDOWN Specifies that the right button is down. 
+MOUSEEVENTF_RIGHTUP Specifies that the right button is up. 
+MOUSEEVENTF_MIDDLEDOWN Specifies that the middle button is down. 
+MOUSEEVENTF_MIDDLEUP Specifies that the middle button is up. 
+MOUSEEVENTF_WHEEL Windows NT/ 2000: Specifies that the wheel has been moved, if the mouse has a wheel. The amount of movement is specified in dwData 
+MOUSEEVENTF_XDOWN Windows 2000: Specifies that an X button was pressed. 
+MOUSEEVENTF_XUP Windows 2000: Specifies that an X button was released. 
+
+
+The values that specify mouse button status are set to indicate changes in status, not ongoing conditions. For example, if the left mouse button is pressed and held down, MOUSEEVENTF_LEFTDOWN is set when the left button is first pressed, but not for subsequent motions. Similarly, MOUSEEVENTF_LEFTUP is set only when the button is first released. 
+
+You cannot specify both MOUSEEVENTF_WHEEL and either MOUSEEVENTF_XDOWN or MOUSEEVENTF_XUP simultaneously in the dwFlags parameter, because they both require use of the mouseData field. 
+
+dx 
+[in] Specifies the mouse's absolute position along the x-axis or its amount of motion since the last mouse event was generated, depending on the setting of MOUSEEVENTF_ABSOLUTE. Absolute data is specified as the mouse's actual x-coordinate; relative data is specified as the number of mickeys moved. A mickey is the amount that a mouse has to move for it to report that it has moved. 
+dy 
+[in] Specifies the mouse's absolute position along the y-axis or its amount of motion since the last mouse event was generated, depending on the setting of MOUSEEVENTF_ABSOLUTE. Absolute data is specified as the mouse's actual y-coordinate; relative data is specified as the number of mickeys moved. 
+dwData 
+[in] If dwFlags contains MOUSEEVENTF_WHEEL, then dwData specifies the amount of wheel movement. A positive value indicates that the wheel was rotated forward, away from the user; a negative value indicates that the wheel was rotated backward, toward the user. One wheel click is defined as WHEEL_DELTA, which is 120. 
+Windows 2000: If dwFlags contains MOUSEEVENTF_XDOWN or MOUSEEVENTF_XUP, then dwData specifies which X buttons were pressed or released. This value may be any combination of the following flags. Value Meaning 
+XBUTTON1 Set if the first X button was pressed or released. 
+XBUTTON2 Set if the second X button was pressed or released. 
+
+
+
+If dwFlags is not MOUSEEVENTF_WHEEL, MOUSEEVENTF_XDOWN, or MOUSEEVENTF_XUP, then dwData should be zero. 
+
+dwExtraInfo 
+[in] Specifies an additional value associated with the mouse event. An application calls GetMessageExtraInfo to obtain this extra information. 
+Return Values
+This function has no return value. 
+
+Remarks
+If the mouse has moved, indicated by MOUSEEVENTF_MOVE being set, dx and dy hold information about that motion. The information is specified as absolute or relative integer values. 
+
+If MOUSEEVENTF_ABSOLUTE value is specified, dx and dy contain normalized absolute coordinates between 0 and 65,535. The event procedure maps these coordinates onto the display surface. Coordinate (0,0) maps onto the upper-left corner of the display surface, (65535,65535) maps onto the lower-right corner. 
+
+If the MOUSEEVENTF_ABSOLUTE value is not specified, dx and dy specify relative motions from when the last mouse event was generated (the last reported position). Positive values mean the mouse moved right (or down); negative values mean the mouse moved left (or up). 
+
+Relative mouse motion is subject to the settings for mouse speed and acceleration level. An end user sets these values using the Mouse application in Control Panel. An application obtains and sets these values with the SystemParametersInfo function. 
+
+The system applies two tests to the specified relative mouse motion when applying acceleration. If the specified distance along either the x or y axis is greater than the first mouse threshold value, and the mouse acceleration level is not zero, the operating system doubles the distance. If the specified distance along either the x- or y-axis is greater than the second mouse threshold value, and the mouse acceleration level is equal to two, the operating system doubles the distance that resulted from applying the first threshold test. It is thus possible for the operating system to multiply relatively-specified mouse motion along the x- or y-axis by up to four times.
+
+Once acceleration has been applied, the system scales the resultant value by the desired mouse speed. Mouse speed can range from 1 (slowest) to 20 (fastest) and represents how much the pointer moves based on the distance the mouse moves. The default value is 10, which results in no additional modification to the mouse motion. 
+
+The mouse_event function is used to synthesize mouse events by applications that need to do so. It is also used by applications that need to obtain more information from the mouse than its position and button state. For example, if a tablet manufacturer wants to pass pen-based information to its own applications, it can write a dynamic-link library (DLL) that communicates directly to the tablet hardware, obtains the extra information, and saves it in a queue. The DLL then calls mouse_event with the standard button and x/y position data, along with, in the dwExtraInfo parameter, some pointer or index to the queued extra information. When the application needs the extra information, it calls the DLL with the pointer or index stored in dwExtraInfo, and the DLL returns the extra information. 
+
+Requirements 
+  Windows NT/2000: Requires Windows NT 3.1 or later.
+  Windows 95/98: Requires Windows 95 or later.
+  Header: Declared in Winuser.h; include Windows.h.
+  Library: Use User32.lib.
+
+See Also
+Mouse Input Overview, Mouse Input Functions, GetMessageExtraInfo, SystemParametersInfo
+
+Private Const WM_NCMOUSEMOVE = &HA0
+Private Const WM_NCLBUTTONDOWN = &HA1
+Private Const WM_NCLBUTTONUP = &HA2
+Private Const WM_NCLBUTTONDBLCLK = &HA3
+Private Const WM_NCRBUTTONDOWN = &HA4
+Private Const WM_NCRBUTTONUP = &HA5
+Private Const WM_NCRBUTTONDBLCLK = &HA6
+Private Const WM_NCMBUTTONDOWN = &HA7
+Private Const WM_NCMBUTTONUP = &HA8
+Private Const WM_NCMBUTTONDBLCLK = &HA9
+
+Private Const MOUSEEVENTF_MOVE = &H1 '  mouse move
+Private Const MOUSEEVENTF_LEFTDOWN = &H2 '  left button down
+Private Const MOUSEEVENTF_LEFTUP = &H4 '  left button up
+Private Const MOUSEEVENTF_RIGHTDOWN = &H8 '  right button down
+Private Const MOUSEEVENTF_RIGHTUP = &H10 '  right button up
+Private Const MOUSEEVENTF_MIDDLEDOWN = &H20 '  middle button down
+Private Const MOUSEEVENTF_MIDDLEUP = &H40 '  middle button up
+Private Const MOUSEEVENTF_ABSOLUTE = &H8000 '  absolute move
