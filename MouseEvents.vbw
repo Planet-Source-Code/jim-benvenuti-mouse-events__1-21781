@@ -1,0 +1,6 @@
+frmMouseEventsDemo = 22, 22, 928, 518, C, 170, 41, 764, 504, C
+ctlMouseEvents = 149, 79, 1055, 575, C, 372, 136, 497, 250, C
+cMouseEventObj = 0, 0, 0, 0, C
+cMemoryBmp = 132, 132, 1038, 628, C
+cBorders = 199, 75, 1105, 571, C
+ApiMod = 200, 43, 1106, 707, C
